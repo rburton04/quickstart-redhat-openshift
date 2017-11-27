@@ -573,7 +573,10 @@
             }
         },
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
         "OpenShiftScalingCWEventRole":{
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -879,6 +882,7 @@
                                 },
                                 "\n",
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 "yum install -y atomic-openshift-docker-excluder \ ",
                                 "  atomic-openshift-node \ ",
                                 "  atomic-openshift-sdn-ovs \ ",
@@ -897,6 +901,8 @@
                                 "  iscsi-initiator-utils \ ",
                                 "  iscsi-initiator-utils-iscsiuio \ ",
 =======
+=======
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 "yum install -y atomic-openshift-docker-excluder ",
                                 "  atomic-openshift-node ",
                                 "  atomic-openshift-sdn-ovs ",
@@ -914,6 +920,9 @@
                                 "  iptables-services ",
                                 "  iscsi-initiator-utils ",
                                 "  iscsi-initiator-utils-iscsiuio ",
+<<<<<<< HEAD
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
+=======
 >>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 " tuned-profiles-atomic-openshift-node",
                                 "\n"
@@ -1007,8 +1016,11 @@
                 "IamInstanceProfile": {
                     "Ref": "SetupRoleProfile"
 <<<<<<< HEAD
+<<<<<<< HEAD
                 },
 =======
+=======
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                 },
                 "InstanceType": {
                     "Ref": "MasterInstanceType"
@@ -1194,6 +1206,7 @@
             },
             "Properties": {
                 "KeyName": {
+<<<<<<< HEAD
                     "Ref": "KeyPairName"
                 },
                 "ImageId": {
@@ -2060,6 +2073,445 @@
                     ]
                 },
                 "KeyName": {
+=======
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
+                    "Ref": "KeyPairName"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSAMIRegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "RHEL74HVM"
+                    ]
+                },
+                "BlockDeviceMappings": [{
+                    "DeviceName": "/dev/sda1",
+                    "Ebs": {
+                        "VolumeSize": "80"
+                    }
+                }],
+                "InstanceMonitoring": "true",
+                "IamInstanceProfile": {
+                    "Ref": "SetupRoleProfile"
+                },
+                "InstanceType": {
+                    "Ref": "MasterInstanceType"
+                },
+<<<<<<< HEAD
+                "NetworkInterfaces": [{
+                    "DeleteOnTermination": "true",
+                    "AssociatePublicIpAddress": "true",
+                    "DeviceIndex": "0",
+                    "GroupSet": [{
+                        "Ref": "OpenShiftSecurityGroup"
+                    }],
+                    "SubnetId": {
+                        "Ref": "PublicSubnet1ID"
+                    }
+=======
+                "SecurityGroups": [{
+                    "Ref": "OpenShiftSecurityGroup"
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
+                }],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "", [
+                                "#!/bin/bash",
+                                "\n",
+
+                                "echo \"========================================================================================================================\"\n",
+                                "echo \"\t------------------[] Starting: Load QuickStart Common\"\n",
+                                "\n",
+                                "QSLOCATION=", {
+                                    "Fn::Sub": [
+                                        "https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}",
+                                        {
+                                            "S3Region": {
+                                                "Fn::If": [
+                                                    "GovCloudCondition",
+                                                    "s3-us-gov-west-1",
+                                                    "s3"
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                "\n",
+                                "UTIL=\"${QSLOCATION}submodules/quickstart-linux-utilities/quickstart-cfn-tools.source\"\n",
+                                "P=/tmp/quickstart-cfn-tools.source \n",
+                                "#qs_retry_command is not available (use until loop)\n",
+                                "curl --retry 10 -s ${UTIL} -o ${P} || n=0; until [[ $n -ge 50 ]]; do curl -s ${UTIL} -o ${P} && break; n=$[$n+1]; done\n",
+                                "source ${P}\n",
+                                "echo \"\t------------------[] Finished: Load QuickStart Common\"\n",
+                                "echo \"========================================================================================================================\"\n",
+                                "\n",
+
+                                "echo \"\t------------------[] Starting: aws cfn-bootstrap installation via [qs_bootstrap_pip, qs_aws-cfn-bootstrap]\"\n",
+                                "qs_bootstrap_pip || qs_err \" pip bootstrap failed \" \n",
+                                "qs_aws-cfn-bootstrap || qs_err \" cfn bootstrap failed \"\n",
+                                "echo \"\t------------------[] Finished: aws cfn-bootstrap installation\"\n",
+                                "\n",
+
+                                "echo \"\t------------------[] Starting: epel configuration via [qs_enable_epel]\"\n",
+                                "# Needed for initial Ansible availability\n",
+                                "qs_enable_epel &> /var/log/userdata.qs_enable_epel.log || qs_err \" enable epel failed \"\n",
+                                "echo \"\t------------------[] Completed epel configuration \"\n",
+                                "\n",
+
+                                "echo \"\t------------------[] Starting: installation of  awscli \"\n",
+                                "pip install awscli  &> /var/log/userdata.awscli_install.log || qs_err \" awscli install failed \"\n",
+                                "echo \"\t------------------[] Completed: install of awscli \"\n",
+                                "\n",
+
+                                "echo \"========================================================================================================================\"\n",
+                                "echo \"\t------------------[] Completed: QuickStart Common Utils \"\n",
+                                "\n",
+
+<<<<<<< HEAD
+                                "echo \"[INFO] Configuring External LoadBalancer for OpenShift UI\" \n",
+                                "aws autoscaling attach-load-balancers --auto-scaling-group-name ",
+                                {
+                                    "Ref": "OpenShiftMasterASG"
+                                },
+                                " --load-balancer-names ",
+                                {
+                                    "Ref": "OpenShiftMasterInternalELB"
+                                },
+=======
+=======
+                                "echo \"========================================================================================================================\"\n",
+                                "echo \"\t------------------[]Attach to Subscription pool\"\n",
+                                "SCRIPT_PATH=",
+                                {
+                                    "Fn::Sub": "s3://${QSS3BucketName}/${QSS3KeyPrefix}"
+
+                                },
+                                "\n",
+                                "aws s3 cp ${SCRIPT_PATH}scripts/redhat_ose-register.sh  ~/redhat_ose-register.sh \n",
+                                "chmod 755 ~/redhat_ose-register.sh\n",
+                                "qs_retry_command 20 ~/redhat_ose-register.sh ",
+                                {
+                                    "Fn::Sub": "${RedhatSubscriptionUserName} ${RedhatSubscriptionPassword} ${RedhatSubscriptionPoolID} "
+
+                                },
+                                "\n",
+                                "echo \"========================================================================================================================\"\n",
+
+                                "\n",
+                                "# Start cfn-init [GetPublicKey, AddPublicKey]\n",
+                                "cfn-init -v ",
+                                " --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                " --resource OpenShiftMasterASLaunchConfig ",
+                                " --configsets quickstart ",
+                                " --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n",
+                                "yum install -y atomic-openshift-docker-excluder ",
+                                "  atomic-openshift-node ",
+                                "  atomic-openshift-sdn-ovs ",
+                                "  ceph-common ",
+                                "  conntrack-tools ",
+                                "  dnsmasq ",
+                                "  docker ",
+                                "  docker-client ",
+                                "  docker-common ",
+                                "  docker-rhel-push-plugin ",
+                                "  glusterfs ",
+                                "  glusterfs-client-xlators ",
+                                "  glusterfs-fuse ",
+                                "  glusterfs-libs ",
+                                "  iptables-services ",
+                                "  iscsi-initiator-utils ",
+                                "  iscsi-initiator-utils-iscsiuio ",
+                                " tuned-profiles-atomic-openshift-node",
+                                "\n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "OpenShiftScalingCWEventRule":{
+          "Type": "AWS::Events::Rule",
+          "Properties":{
+            "Description":"CWEvent rule to trigger OpenShift Scaling scripts within the Ansible config server. (AWS QuickStart)",
+            "Name":"OpenshiftQuickstart-TriggerAnsibleScaling",
+            "State":"ENABLED",
+            "EventPattern":{
+                  "source": ["aws.autoscaling"],
+                  "detail-type": [
+                    "EC2 Instance Launch Successful",
+                    "EC2 Instance Terminate Successful",
+                    "EC2 Instance Terminate Unsuccessful"
+                    ],
+                  "detail": {
+                    "AutoScalingGroupName": [
+                      {"Ref":"OpenShiftMasterASG"},
+                      {"Ref":"OpenShiftEtcdASG"},
+                      {"Ref":"OpenShiftNodeASG"}
+                      ]
+                    }
+                  },
+            "Targets": [{
+                      "Id":"OSEScalingSSMTarget1",
+                      "Arn":"arn:aws:ssm:us-east-1::document/AWS-RunShellScript",
+                      "Input":"{\"commands\":[\"/bin/aws-ose-qs-scale --scale-in-progress\"],\"workingDirectory\":[\"/\"],\"executionTimeout\":[\"3600\"]}",
+                      "RoleArn":{"Fn::GetAtt":["OpenShiftScalingCWEventRole","Arn"]},
+                      "RunCommandParameters":{
+                        "RunCommandTargets":[
+                          {
+                            "Key": "InstanceIds",
+                            "Values":[ {"Ref":"AnsibleConfigServer"}]
+                          }
+                        ]
+                      }
+              }]
+            }
+        },
+        "OpenShiftMasterELB": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "Properties": {
+                "ConnectionSettings": {
+                    "IdleTimeout": 1200
+                },
+                "CrossZone": true,
+                "Subnets": [{
+                        "Ref": "PublicSubnet1ID"
+                    }, {
+                        "Ref": "PublicSubnet2ID"
+                    },
+                    {
+                        "Ref": "PublicSubnet3ID"
+                    }
+                ],
+                "SecurityGroups": [{
+                    "Ref": "OpenShiftSecurityGroup"
+                }],
+                "Listeners": [{
+                        "InstancePort": "9000",
+                        "InstanceProtocol": "TCP",
+                        "LoadBalancerPort": "9000",
+                        "Protocol": "TCP"
+                    },
+                    {
+                        "InstancePort": "8443",
+                        "InstanceProtocol": "TCP",
+                        "LoadBalancerPort": "8443",
+                        "Protocol": "TCP"
+                    },
+                    {
+                        "InstancePort": "80",
+                        "InstanceProtocol": "TCP",
+                        "LoadBalancerPort": "80",
+                        "Protocol": "TCP"
+                    },
+                    {
+                        "InstancePort": "443",
+                        "InstanceProtocol": "TCP",
+                        "LoadBalancerPort": "443",
+                        "Protocol": "TCP"
+                    }
+                ],
+                "HealthCheck": {
+                    "Target": "TCP:22",
+                    "HealthyThreshold": "2",
+                    "UnhealthyThreshold": "3",
+                    "Interval": "30",
+                    "Timeout": "3"
+                }
+            }
+        },
+        "OpenShiftMasterInternalELB": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "Properties": {
+                "ConnectionSettings": {
+                    "IdleTimeout": 1200
+                },
+                "CrossZone": true,
+                "Scheme": "internal",
+                "Subnets": [{
+                        "Ref": "PrivateSubnet1ID"
+                    }, {
+                        "Ref": "PrivateSubnet2ID"
+                    },
+                    {
+                        "Ref": "PrivateSubnet3ID"
+                    }
+                ],
+                "SecurityGroups": [{
+                    "Ref": "OpenShiftInternalSecurityGroup"
+                }],
+                "Listeners": [{
+                        "InstancePort": "9000",
+                        "InstanceProtocol": "TCP",
+                        "LoadBalancerPort": "9000",
+                        "Protocol": "TCP"
+                    },
+                    {
+                        "InstancePort": "8443",
+                        "InstanceProtocol": "TCP",
+                        "LoadBalancerPort": "8443",
+                        "Protocol": "TCP"
+                    },
+                    {
+                        "InstancePort": "80",
+                        "InstanceProtocol": "TCP",
+                        "LoadBalancerPort": "80",
+                        "Protocol": "TCP"
+                    },
+                    {
+                        "InstancePort": "443",
+                        "InstanceProtocol": "TCP",
+                        "LoadBalancerPort": "443",
+                        "Protocol": "TCP"
+                    }
+                ],
+                "HealthCheck": {
+                    "Target": "TCP:22",
+                    "HealthyThreshold": "2",
+                    "UnhealthyThreshold": "3",
+                    "Interval": "30",
+                    "Timeout": "3"
+                }
+            }
+        },
+        "OpenShiftNodeELB": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "Properties": {
+                "Subnets": [{
+                        "Ref": "PrivateSubnet1ID"
+                    },
+                    {
+                        "Ref": "PrivateSubnet2ID"
+                    },
+                    {
+                        "Ref": "PrivateSubnet3ID"
+                    }
+                ],
+                "Scheme": "internal",
+                "SecurityGroups": [{
+                    "Ref": "OpenShiftSecurityGroup"
+                }],
+                "Listeners": [{
+                    "InstancePort": "8443",
+                    "InstanceProtocol": "TCP",
+                    "LoadBalancerPort": "8443",
+                    "Protocol": "TCP"
+                }],
+                "HealthCheck": {
+                    "Target": "TCP:22",
+                    "HealthyThreshold": "2",
+                    "UnhealthyThreshold": "3",
+                    "Interval": "30",
+                    "Timeout": "3"
+                }
+            }
+        },
+        "AnsibleConfigServer": {
+            "Type": "AWS::EC2::Instance",
+            "DependsOn": "OpenShiftNodeASG",
+            "Metadata": {
+                "AWS::CloudFormation::Init": {
+                    "configSets": {
+                        "cfg_node_keys": ["GetPublicKey", "AddPublicKey", "SetPrivateKey"],
+                        "cfg_ansible": ["CfgAnsible"],
+                        "cfg_networkmgr": ["rpms", "NetworkManager"]
+                    },
+                    "rpms": {
+                        "packages": {
+                            "yum": {
+                                "NetworkManager": []
+
+                            }
+                        }
+                    },
+                    "NetworkManager": {
+                        "commands": {
+                            "start_enable_nm": {
+                                "command": "systemctl start NetworkManager && systemctl enable  NetworkManager",
+                                "ignoreErrors": "false"
+                            }
+                        }
+                    },
+                    "SetPrivateKey": {
+                        "files": {
+                            "/root/.ssh/id_rsa": {
+                                "content": {
+                                    "Fn::Join": ["", [{
+                                            "Fn::GetAtt": ["GetRSA", "PEM"]
+                                        },
+                                        "\n"
+                                    ]]
+                                },
+                                "mode": "000400",
+                                "owner": "root",
+                                "group": "root"
+                            }
+                        }
+                    },
+                    "GetPublicKey": {
+                        "files": {
+                            "/root/.ssh/public.key": {
+                                "content": {
+                                    "Fn::Join": ["", [
+                                        "#QuickStart Generated\n",
+                                        {
+                                            "Fn::GetAtt": ["GetRSA", "PUB"]
+                                        },
+                                        "\n"
+                                    ]]
+                                },
+                                "mode": "000400",
+                                "owner": "root",
+                                "group": "root"
+                            }
+                        }
+                    },
+                    "AddPublicKey": {
+                        "commands": {
+                            "append-publickey": {
+                                "command": "cat /root/.ssh/public.key >>/root/.ssh/authorized_keys",
+                                "ignoreErrors": "false"
+                            }
+                        }
+                    },
+                    "CfgAnsible": {
+                        "packages": {
+                            "yum": {
+                                "ansible": []
+                            }
+                        },
+                        "commands": {
+                            "disable-host-key-checking": {
+                                "command": "sed -i 's/#host_key_checking = False/host_key_checking = False/g' /etc/ansible/ansible.cfg",
+                                "ignoreErrors": "false"
+                            }
+                        }
+                    }
+                }
+            },
+            "Properties": {
+                "IamInstanceProfile": {
+                    "Ref": "SetupRoleProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSAMIRegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "RHEL74HVM"
+                    ]
+                },
+                "KeyName": {
                     "Ref": "KeyPairName"
                 },
                 "Tags": [{
@@ -2135,20 +2587,19 @@
                                 "echo \"\t------------------[] Completed: QuickStart Common Utils \"\n",
                                 "\n",
 
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 "echo \"[INFO] Configuring External LoadBalancer for OpenShift UI\" \n",
                                 "aws autoscaling attach-load-balancers --auto-scaling-group-name ",
                                 {
                                     "Ref": "OpenShiftMasterASG"
+<<<<<<< HEAD
                                 },
                                 " --load-balancer-names ",
                                 {
                                     "Ref": "OpenShiftMasterInternalELB"
                                 },
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
 =======
-                                "echo \"[INFO] Configuring External LoadBalancer for OpenShift UI\" \n",
-                                "aws autoscaling attach-load-balancers --auto-scaling-group-name ",
-                                {
-                                    "Ref": "OpenShiftMasterASG"
                                 },
                                 " --load-balancer-names ",
                                 {
@@ -2167,6 +2618,7 @@
                                     "Fn::Sub": "s3://${QSS3BucketName}/${QSS3KeyPrefix}"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 },
                                 "\n",
                                 "aws s3 cp ${SCRIPT_PATH}scripts/redhat_ose-register.sh  ~/redhat_ose-register.sh \n",
@@ -2180,6 +2632,10 @@
 =======
                                 },
                                 "\n",
+=======
+                                },
+                                "\n",
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 "aws s3 cp ${SCRIPT_PATH}scripts/redhat_ose-register.sh  ~/redhat_ose-register.sh \n",
                                 "chmod 755 ~/redhat_ose-register.sh\n",
                                 "qs_retry_command 20 ~/redhat_ose-register.sh ",
@@ -2188,6 +2644,9 @@
 
                                 },
                                 "\n",
+<<<<<<< HEAD
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
+=======
 >>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 "echo \"========================================================================================================================\"\n",
 
@@ -2201,6 +2660,7 @@
                                 "echo \"[INFO] Generating Ansible inventory \" \n",
                                 "aws s3 cp ${SCRIPT_PATH}scripts/get_nodes.py  ~/get_nodes.py \n",
                                 "pip install boto3 &> /var/log/userdata.boto3_install.log || qs_err \" boto3 install failed \"\n",
+<<<<<<< HEAD
 <<<<<<< HEAD
                                 "python ~/get_nodes.py ",
                                 {
@@ -2228,12 +2688,17 @@
                                 }, " ", "nodes > /tmp/openshift_instances-nodes",
                                 "\n",
 =======
+=======
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 "aws s3 cp ",
                                 {
                                   "Fn::Sub": "s3://${QSS3BucketName}/${QSS3KeyPrefix}"
                                 },
                                 "scripts/scaling /root/ose_scaling --recursive \n",
                                 "pip install /root/ose_scaling \n",
+<<<<<<< HEAD
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
+=======
 >>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 "# Start cfn-configset [cfg_node_keys]\n",
                                 "cfn-init -v ",
@@ -2296,15 +2761,21 @@
                                 "echo openshift_hostname=${INTERNAL_MASTER_ELBDNSNAME} >> /etc/ansible/hosts \n",
                                 "echo \"[INFO] Configured OpenShift Variable\" \n",
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 "cat /tmp/openshift_instances-* >>/etc/ansible/hosts \n",
                                 "sed -i 's/#pipelining = False/pipelining = True/g' /etc/ansible/ansible.cfg \n",
                                 "sed -i 's/#log_path/log_path/g' /etc/ansible/ansible.cfg \n",
 =======
+=======
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 "/bin/aws-ose-qs-scale --generate-initial-inventory \n",
                                 "cat /tmp/openshift_ansible_inventory* >> /etc/ansible/hosts \n",
                                 "sed -i 's/#pipelining = False/pipelining = True/g' /etc/ansible/ansible.cfg \n",
                                 "sed -i 's/#log_path/log_path/g' /etc/ansible/ansible.cfg \n",
                                 "sed -i 's/#stdout_callback.*/stdout_callback = json/g' /etc/ansible/ansible.cfg \n",
+<<<<<<< HEAD
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
+=======
 >>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 "echo \"[INFO] Poll till all nodes are under Ansible (max tries = 50)\" \n",
                                 "qs_retry_command 50 ansible -m ping all \n",
@@ -2315,6 +2786,12 @@
                                 "yum -y install atomic-openshift-utils\n",
                                 "yum -y install atomic-openshift-excluder atomic-openshift-docker-excluder\n",
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                                "yum install -y  https://s3-us-west-1.amazonaws.com/amazon-ssm-us-west-1/latest/linux_amd64/amazon-ssm-agent.rpm \n",
+                                "systemctl start amazon-ssm-agent \n",
+                                "systemctl enable amazon-ssm-agent \n",
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
 =======
                                 "yum install -y  https://s3-us-west-1.amazonaws.com/amazon-ssm-us-west-1/latest/linux_amd64/amazon-ssm-agent.rpm \n",
                                 "systemctl start amazon-ssm-agent \n",
@@ -2345,7 +2822,10 @@
                                 "echo \"[INFO] Starting OpenShift Cluster Build (Beginning Ansible Playbook run!!!)\" \n",
                                 "date >>~/playbooks.info\n",
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 "date >>~/playbooks.info\n",
                                 "aws s3 cp ",
                                 {
@@ -2353,6 +2833,9 @@
 
                                 },
                                 "scripts/scaleup_wrapper.yml  /usr/share/ansible/openshift-ansible/\n",
+<<<<<<< HEAD
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
+=======
 >>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
                                 "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml || qs_err \" ansible-playbook failed!! \"\n",
                                 "date >>~/playbooks.info\n",
