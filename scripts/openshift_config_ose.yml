@@ -11,6 +11,10 @@ etcd
 ansible_ssh_user=root
 openshift_deployment_type=openshift-enterprise
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+deployment_type=openshift-enterprise
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
 =======
 deployment_type=openshift-enterprise
 >>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
