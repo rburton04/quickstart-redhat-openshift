@@ -10,6 +10,10 @@ etcd
 [OSEv3:vars]
 ansible_ssh_user=root
 openshift_deployment_type=openshift-enterprise
+<<<<<<< HEAD
+=======
+deployment_type=openshift-enterprise
+>>>>>>> b47b7969e479ff01c4e1cbf295082852abd33e02
 containerized=false
 openshift_master_cluster_method=native
 openshift_router_selector='region=infra'
